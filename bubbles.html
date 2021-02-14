@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bubbles</title>
+    <style>
+        body {
+            margin: 0;
+            background-image: url("background.png");
+            background-size: cover;
+        }
+        .bubble {
+            position: fixed;
+            box-sizing: border-box;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: inset -20px -30px 30px rgba(62,93,120,0.5);
+            opacity: 0.7;
+            transform: translate(-50%, -50%);
+            transition: width 1s linear, height 1s linear;
+        }
+        .container {
+            height: 100vh;
+            background-image: radial-gradient(#ffffff 45%, rgba(59,177,237,0.1));
+        }
+        .container.over {
+            background-image: radial-gradient(#ffffff 30%, rgba(153,21,237,0.1));
+        }
+        .intro {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 700px;
+            height: 100vh;
+            transform: translate(-50%, -57%);
+            margin: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        h1 {
+            margin-bottom: 50px;
+            font-size: 110px;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            text-align: center;
+            color: transparent;
+
+            background: linear-gradient(90deg, #067ced, #0cb6ed, #0fedea);
+            -webkit-background-clip: text;
+        }
+        h1.over {
+            background: linear-gradient(90deg, #9816ff, #ff3ded, #ff586f);
+            -webkit-background-clip: text;
+        }
+        button {
+            padding: 12px 0;
+            margin-bottom: 5px;
+            border: none;
+            box-sizing: border-box;
+            border-radius: 5px;
+            font-size: 50px;
+            font-weight: 900;
+            font-family: Arial, sans-serif;
+            text-transform: lowercase;
+            color: #ffffff;
+
+            box-shadow: #84dced 0 10px 20px 10px;
+            background-color: #6defe3;
+
+            transition: box-shadow 0.5s;
+        }
+        button:hover {
+            outline: none;
+            opacity: 0.9;
+            box-shadow: #68bdce 0 10px 20px 10px;
+        }
+        button.over {
+            background-color: #ff99ef;
+            box-shadow: #b495ff 0 10px 20px 10px;
+        }
+        button.over:hover {
+            box-shadow: #9377d7 0 10px 20px 10px;
+        }
+
+        p {
+            text-align: center;
+
+            font-size: 40px;
+            font-weight: bold;
+            font-family: Arial, sans-serif;
+            font-style: italic;
+            color: #6d5eb6;
+        }
+    </style>
+</head>
+<body>
+<script>
+    let result = 0;
+    let flag = 0;
+    let time = 0;
+    let colors = ["#fffe62", "#87ff77", "#6dcfff", "#7482ff", "#9179ff", "#cb73ff", "#ff82e9"];
+
+    function randomInt(a, b) {
+        return(Math.floor(Math.random() * (b-a)) + a);
+    }
+
+    function timeout() {
+        if (flag == 11) {
+            stopGame();
+            result = flag = 0;
+            return 0;
+        }
+        else {
+            showBubble(generateBubble());
+            flag++;
+        }
+        console.log(flag);
+        setTimeout(() => {timeout()}, time);
+    }
+
+    function stopGame() {
+        document.body.style = "";
+        document.body.innerHTML = "";
+        let container = document.createElement("div");
+        container.classList.add("container", "over");
+        let introContainer = document.createElement("div");
+        let record = document.createElement("p");
+        record.innerHTML = "Your result: " + result;
+        introContainer.className = "intro";
+        let header = document.createElement("h1");
+        header.className = "over";
+        header.innerHTML = "Game over";
+        let button = document.createElement("button");
+        button.className = "over";
+        button.innerHTML = "Play once more";
+        introContainer.append(record, header, button);
+        container.append(introContainer);
+        document.body.append(container);
+    }
+
+    function showIntro() {
+        let container = document.createElement("div");
+        container.className = "container";
+        let introContainer = document.createElement("div");
+        introContainer.className = "intro";
+        let headText = document.createElement("h1");
+        headText.innerHTML = "Let's play BUBBLES!";
+        let arr = ["easy", "middle", "hard"];
+        introContainer.append(headText);
+        for (let i = 0; i < 3; i++) {
+            let startButton = document.createElement("button");
+            startButton.innerHTML = "Start game " + arr[i];
+            startButton.setAttribute("data-time", `${1000 - i*250}`);
+            introContainer.append(startButton);
+        }
+        container.append(introContainer);
+        document.body.append(container);
+    }
+
+    function showBubble({x, y, r, s}) {
+        let bubble = document.createElement("div");
+        bubble.classList.add("bubble");
+        document.body.append(bubble);
+        bubble.style.backgroundColor = colors[randomInt(0, colors.length)];
+        bubble.style.top = y + "px";
+        bubble.style.left = x + "px";
+        bubble.style.boxShadow = "inset -" + s + "px -" + s + "px 30px rgba(62,93,120,0.4)";
+        let dot = document.createElement("div");
+        bubble.append(dot);
+        dot.style = "position: absolute; top: " + s + "px; left: " + s + "px; background-color: rgba(255, 255, 255, 0.5); border-radius: 50%; box-shadow: 0 0 30px 20px rgba(255, 255, 255, 0.8)";
+        setTimeout(() => {bubble.style.height = bubble.style.width = 2*r + "px";}, time);
+    }
+    function generateBubble() {
+        let r = randomInt(50, 150);
+        let x = randomInt(r + 10, document.documentElement.clientWidth - r - 9);
+        let y = randomInt(r + 10, document.documentElement.clientHeight - r - 9);
+        let s = Math.floor(r * 0.5);
+        return {x, y, r, s};
+    }
+
+    document.body.onclick = function(event)  {
+        if (event.target.nodeName == "DIV" && event.target.className == "bubble") {
+            event.target.remove();
+            result++;
+            flag--;
+        }
+        else if (event.target.nodeName == "BUTTON") {
+            if (event.target.dataset.time) {
+                time = event.target.dataset.time;
+            }
+            document.querySelector(".container").remove();
+            document.body.style.backgroundImage = "none";
+            timeout();
+        }
+    }
+    showIntro();
+</script>
+</body>
+</html>
